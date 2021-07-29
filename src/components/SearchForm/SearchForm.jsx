@@ -1,34 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-import { requestAccessToken, search } from "../../services/api";
-
-const SearchForm = ({ setCurrentSearch }) => {
-  const [accessToken, setAccessToken] = useState("");
+const SearchForm = ({ handleSearch }) => {
   const [query, setQuery] = useState("");
-
-  useEffect(() => {
-    const authenticate = async () => {
-      const result = await requestAccessToken();
-      setAccessToken(result);
-    };
-    authenticate();
-  }, []);
 
   const handleChange = (e) => {
     setQuery(e.target.value);
   };
 
   const handleSubmit = (e) => {
-    const getSearchedItems = async () => {
-      e.preventDefault();
-      const results = await search({
-        qry: query,
-        accessToken,
-      });
-
-      setCurrentSearch(results);
-    };
-    getSearchedItems();
+    e.preventDefault();
+    handleSearch(query);
   };
   return (
     <div className="App">

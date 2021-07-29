@@ -6,13 +6,13 @@ const SearchResults = ({ currentSearch }) => {
       <h3>Top Results</h3>
 
       <h5>Albums</h5>
-      <p>{albums && albums.items && albums.items[0].name}</p>
+      {albums?.items?.[0]?.name}
 
       <h5>Artists</h5>
-      <p>{artists && artists.items && artists.items[0].name}</p>
+      {artists?.items?.[0]?.name}
 
       <h5>Tracks</h5>
-      <p>{tracks && tracks.items && tracks.items[0].name}</p>
+      {tracks?.items?.[0]?.name}
     </div>
   );
 };
