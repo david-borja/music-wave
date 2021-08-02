@@ -1,26 +1,28 @@
 // Here we are gonna store the three things we get back from our server after we Login
 import { useState, useEffect } from "react";
 
-import axios from "axios";
-
 const useAuth = (authCode) => {
   const [accessToken, setAccessToken] = useState();
   const [refreshToken, setRefreshToken] = useState();
   const [expiresIn, setExpiresIn] = useState();
 
   useEffect(() => {
-    axios
-      .post("http://localhost:5000/login", {
-        code: authCode,
-      })
-      .then((res) => {
-        console.log(res.data);
-        setAccessToken(res.data.accessToken);
-        setRefreshToken(res.data.refreshToken);
-        setExpiresIn(res.data.expiresIn);
+    fetch("http://localhost:5000/login", {
+      method: "POST",
+      headers: {
+        // Accept header specifies what media types are acceptable as a response
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ code: authCode }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setAccessToken(data.accessToken);
+        setRefreshToken(data.refreshToken);
         // setExpiresIn(61); just to check if it triggered the refresh every second
-
-        // pushes the root url into history, so it clears the authCode from the url
+        setExpiresIn(data.expiresIn);
         window.history.pushState({}, null, "/");
       })
       .catch((error) => {
@@ -36,21 +38,29 @@ const useAuth = (authCode) => {
 
     // Our refreshToken and expiresIn are technically never refreshing. So the setTimeout is only being run once. If we want to run the refresh every time refreshToken or expiresIn change, we have to use setInterval instead of setTimeout.
 
-    // It makes sure this refresh only runs right before our refreshToken expires (for example, one min before)
+    // It makes sure this refresh only runs right before our accessToken expires (for example, one min before)
     const interval = setInterval(() => {
-      axios
-        .post("http://localhost:5000/refresh", {
-          refreshToken,
-        })
-        .then((res) => {
-          setAccessToken(res.data.accessToken);
-          setExpiresIn(res.data.expiresIn);
+      fetch("http://localhost:5000/refresh", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refreshToken }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          setAccessToken(data.accessToken);
           // setExpiresIn(61); just to check if it triggered the refresh every second
+          setExpiresIn(data.expiresIn);
         })
-        .catch(() => {
+        .catch((error) => {
+          console.log(error);
           // redirects the user to the homepage
           window.location = "/";
         });
+
       // Subtracts 60 seconds from expiresIn, and then converts seconds to miliseconds
     }, (expiresIn - 60) * 1000);
 
