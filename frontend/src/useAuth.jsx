@@ -1,10 +1,14 @@
 // Here we are gonna store the three things we get back from our server after we Login
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import UserContext from "./contexts/UserContext";
 
-const useAuth = (authCode) => {
-  const [accessToken, setAccessToken] = useState();
-  const [refreshToken, setRefreshToken] = useState();
-  const [expiresIn, setExpiresIn] = useState();
+const useAuth = ({ authCode }) => {
+  // Now accessToken and setAccessToken refer to the global state that we get from consuming UserContext
+  const { accessToken, setAccessToken } = useContext(UserContext);
+
+  // const [accessToken, setAccessToken] = useState("");
+  const [refreshToken, setRefreshToken] = useState("");
+  const [expiresIn, setExpiresIn] = useState(0);
 
   useEffect(() => {
     fetch("http://localhost:5000/login", {
@@ -22,7 +26,9 @@ const useAuth = (authCode) => {
         setAccessToken(data.accessToken);
         setRefreshToken(data.refreshToken);
         // setExpiresIn(61); just to check if it triggered the refresh every second
+        // setExpiresIn(61);
         setExpiresIn(data.expiresIn);
+        // history.push("/playlists")
         window.history.pushState({}, null, "/");
       })
       .catch((error) => {
@@ -30,7 +36,7 @@ const useAuth = (authCode) => {
         // redirects the user to the homepage
         window.location = "/";
       });
-  }, [authCode]);
+  }, [authCode, setAccessToken]);
 
   useEffect(() => {
     // This prevents the effect to run before having a refreshToken and expiresIn. Or, in other words, this condition prevents this effect from running if the previous effect hasn't finished running
@@ -53,6 +59,7 @@ const useAuth = (authCode) => {
           console.log(data);
           setAccessToken(data.accessToken);
           // setExpiresIn(61); just to check if it triggered the refresh every second
+          // setExpiresIn(61);
           setExpiresIn(data.expiresIn);
         })
         .catch((error) => {
@@ -68,7 +75,7 @@ const useAuth = (authCode) => {
     return () => clearInterval(interval);
 
     // whenever refreshToken or expiresIn changes
-  }, [refreshToken, expiresIn]);
+  }, [refreshToken, expiresIn, setAccessToken]);
 
   return accessToken;
 };

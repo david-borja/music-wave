@@ -1,21 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useContext } from "react";
+
+import UserContext from "../../contexts/UserContext";
 
 import SearchForm from "../../components/SearchForm/SearchForm";
 import SearchResults from "../../components/SearchResults/SearchResults";
 
-import { requestAccessToken, search } from "../../services/api";
+import { search } from "../../services/api";
 
 const useCurrentSearch = () => {
-  const [accessToken, setAccessToken] = useState("");
   const [currentSearch, setCurrentSearch] = useState({});
-
-  useEffect(() => {
-    const authenticate = async () => {
-      const result = await requestAccessToken();
-      setAccessToken(result);
-    };
-    authenticate();
-  }, []);
+  const { accessToken } = useContext(UserContext);
+  // AccessToken is undefined if I navigate to the SearchPage by manually changing the url. For now, accessToken is only accessible when I navigate to SearchPage by changing the location programatically from UserPlaylistPage with "setLocation()"
+  console.log({ accessToken });
 
   const handleSearch = async (query) => {
     const results = await search({

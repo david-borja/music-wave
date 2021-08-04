@@ -1,7 +1,18 @@
-import useAuth from "./useAuth";
+import { useContext } from "react";
+import { useLocation } from "wouter";
 
-const UserPlaylistsPage = ({ authCode }) => {
-  const accessToken = useAuth(authCode);
+import UserContext from "../../contexts/UserContext";
+import useAuth from "../../useAuth";
+
+const UserPlaylistsPage = (authCode) => {
+  useAuth(authCode);
+  const { accessToken } = useContext(UserContext);
+  console.log({ accessToken });
+
+  // This is a hook from wouter that imitates history.push("/someroute")
+  const [location, setLocation] = useLocation();
+  setLocation("/search");
+
   return (
     <div>
       <h3>UserPlaylists Page</h3>
