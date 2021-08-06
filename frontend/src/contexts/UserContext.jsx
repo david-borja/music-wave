@@ -2,8 +2,14 @@ import React, { useState } from "react";
 
 const Context = React.createContext({});
 
-export const UserContextProvider = ({ children }) => {
+const useAccessToken = () => {
   const [accessToken, setAccessToken] = useState("");
+  return { accessToken, setAccessToken };
+};
+
+export const UserContextProvider = ({ children }) => {
+  const { accessToken, setAccessToken } = useAccessToken();
+
   return (
     <Context.Provider value={{ accessToken, setAccessToken }}>
       {children}

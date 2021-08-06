@@ -1,5 +1,6 @@
 export const search = async ({ qry, accessToken }) => {
   try {
+    console.log({ qry });
     const result = await fetch(
       `https://api.spotify.com/v1/search?q=${qry}&type=album,artist,track`,
       {
