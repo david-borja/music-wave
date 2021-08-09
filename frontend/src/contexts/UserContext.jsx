@@ -7,8 +7,8 @@ const useAccessToken = () => {
   return { accessToken, setAccessToken };
 };
 
-export const UserContextProvider = ({ children }) => {
-  const { accessToken, setAccessToken } = useAccessToken();
+export const UserContextProvider = ({ children, spotifyToken}) => {
+  const { accessToken, setAccessToken } = useAccessToken(spotifyToken);
 
   return (
     <Context.Provider value={{ accessToken, setAccessToken }}>
