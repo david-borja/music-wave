@@ -1,29 +1,23 @@
 import { useContext } from "react";
-// import { useLocation } from "wouter";
 
 import UserContext from "../../contexts/UserContext";
-import useAuth from "../../useAuth";
+import { useCheckAuthentication } from "../../App";
 
-// This CH is probably completely overkill
+// This CH is probably completely overkill. This encapsulation will make more sense when its logic starts to grow
 const useUserContext = (UserContext) => {
   return useContext(UserContext);
 };
 
-const UserPlaylistsPage = (authCode) => {
-  useAuth(authCode);
+const UserPlaylistsPage = () => {
+  console.log("UserPlaylistPage");
+  useCheckAuthentication();
 
-  const { accessToken } = useUserContext(UserContext);
-  console.log({ accessToken });
-
-  // // This is a hook from wouter that imitates history.push("/someroute")
-  // const [location, setLocation] = useLocation();
-  // setLocation("/search");
-
+  const { spotifyToken } = useUserContext(UserContext);
   return (
     <div>
       <h3>UserPlaylists Page</h3>
 
-      {accessToken ? "User's access token ready to be used" : null}
+      {spotifyToken ? "User's access token ready to be used" : null}
     </div>
   );
 };
