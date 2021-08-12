@@ -27,12 +27,6 @@ export const UserContextProvider = ({ children, spotifyToken }) => {
     setExpiresIn,
   } = useAccessToken();
 
-  // console.log("CONTEXTPROVIDER {");
-  // console.log({ accessToken });
-  // console.log({ refreshToken });
-  // console.log({ spotifyToken });
-  // console.log("CONTEXTPROVIDER }");
-
   return (
     <Context.Provider
       value={{

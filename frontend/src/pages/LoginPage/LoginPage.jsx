@@ -3,23 +3,32 @@ import { useLocation } from "wouter";
 
 import { accessUrlSearchParam } from "../../utils/urlParams";
 import UserContext from "../../contexts/UserContext";
+import { useCheckAuthentication } from "../../App";
 
 console.log("LoginPage");
 
 const AUTH_URL = `https://accounts.spotify.com/authorize?client_id=${process.env.REACT_APP_SPOTIFY_CLIENT_ID}&response_type=code&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state`;
 
 // It seems we have to call this function here outside the component. Otherwise it returns null
-console.log("LoginComponent");
 const authCode = accessUrlSearchParam("code");
 
 const useLogin = (authCode) => {
   const [_, setLocation] = useLocation();
-  const { accessToken, setAccessToken, setRefreshToken, setExpiresIn } =
-    useContext(UserContext);
+  const {
+    spotifyToken,
+    accessToken,
+    setAccessToken,
+    setRefreshToken,
+    setExpiresIn,
+  } = useContext(UserContext);
 
   console.log({ accessToken });
 
   useEffect(() => {
+    if (spotifyToken) {
+      setLocation("/");
+    }
+
     if (authCode && !accessToken) {
       fetch("http://localhost:5000/login", {
         method: "POST",
@@ -60,6 +69,7 @@ const useLogin = (authCode) => {
     setRefreshToken,
     setExpiresIn,
     setLocation,
+    spotifyToken,
   ]);
 };
 
