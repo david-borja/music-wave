@@ -1,20 +1,24 @@
 import React, { useState } from "react";
 
 const Context = React.createContext({});
+Context.displayName = "UserContext";
 
-const useAccessToken = () => {
-  const [accessToken, setAccessToken] = useState("");
-  return { accessToken, setAccessToken };
-};
+const useContextCredentials = () => {
+  const [ accessToken, setAccessToken ] = useState(null);
+  const [ refreshToken, seRefreshToken ] = useState(null);
 
-export const UserContextProvider = ({ children, spotifyToken}) => {
-  const { accessToken, setAccessToken } = useAccessToken(spotifyToken);
+  const setNewCredentials = (userCredentials) => {
+    setAccessToken(userCredentials.spotifyToken);
+    seRefreshToken(userCredentials.spotifyRefreshToken);
+  }
 
-  return (
-    <Context.Provider value={{ accessToken, setAccessToken }}>
-      {children}
-    </Context.Provider>
-  );
-};
+  return { accessToken, refreshToken, setNewCredentials }
+}
+
+export const UserContextProvider = ({ children }) => (
+  <Context.Provider value={useContextCredentials()}>
+    {children}
+  </Context.Provider>
+);
 
 export default Context;

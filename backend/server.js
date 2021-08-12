@@ -11,8 +11,6 @@ app.use(bodyParser.json());
 app.post("/refresh", (req, res) => {
   const refreshToken = req.body.refreshToken;
 
-  console.log("refreshing");
-
   const credentials = {
     redirectUri: process.env.REDIRECT_URI,
     clientId: process.env.SPOTIFY_CLIENT_ID,
@@ -26,6 +24,7 @@ app.post("/refresh", (req, res) => {
     .refreshAccessToken()
     .then((data) => {
       res.json({
+        refreshToken: data.body.refresh_token,
         accessToken: data.body.access_token,
         expiresIn: data.body.expires_in,
       });

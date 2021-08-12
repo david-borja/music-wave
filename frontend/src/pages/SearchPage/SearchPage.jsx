@@ -1,36 +1,33 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 
-import UserContext from "../../contexts/UserContext";
+import {useCheckAutentication} from '../../hooks/useCheckAutentication';
+import {useAutenticationFetch} from '../../hooks/useAutenticatedFetch';
 
 import SearchForm from "../../components/SearchForm/SearchForm";
 import SearchResults from "../../components/SearchResults/SearchResults";
 
-import { search } from "../../services/api";
 
 const useCurrentSearch = () => {
+  useCheckAutentication()
+  const {loading, fetchWithAuth} = useAutenticationFetch();
   const [currentSearch, setCurrentSearch] = useState({});
-  const { accessToken } = useContext(UserContext);
-  // AccessToken is undefined if I navigate to the SearchPage by manually changing the url. For now, accessToken is only accessible when I navigate to SearchPage by changing the location programatically from UserPlaylistPage with "setLocation()"
-  console.log({ accessToken });
 
   const handleSearch = async (query) => {
-    const results = await search({
-      qry: query,
-      accessToken,
-    });
+    const searchUrl = `search?q=${query}&type=album,artist,track`
+    const results = await fetchWithAuth(searchUrl);
     setCurrentSearch(results);
   };
 
-  return { currentSearch, handleSearch };
+  return { currentSearch, handleSearch, loading };
 };
 
 const SearchPage = () => {
-  const { currentSearch, handleSearch } = useCurrentSearch();
+  const { currentSearch, handleSearch, loading } = useCurrentSearch();
 
   return (
     <div>
       <SearchForm handleSearch={handleSearch} />
-      <SearchResults currentSearch={currentSearch} />
+      { loading ? (<div>Loading...</div>) : <SearchResults currentSearch={currentSearch} />}
     </div>
   );
 };
