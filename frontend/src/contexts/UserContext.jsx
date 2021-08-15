@@ -2,43 +2,30 @@ import React, { useState } from "react";
 
 const Context = React.createContext({});
 
-const useAccessToken = () => {
-  const [accessToken, setAccessToken] = useState("");
-  const [refreshToken, setRefreshToken] = useState("");
-  const [expiresIn, setExpiresIn] = useState(0);
+// The displayName property determines how the context object will be displayed on React DevTools
+Context.displayName = "UserContext";
+
+const useContextCredentials = () => {
+  const [accessToken, setAccessToken] = useState(null);
+  const [refreshToken, setRefreshToken] = useState(null);
+
+  const setNewCredentials = (userCredentials) => {
+    setAccessToken(userCredentials.accessToken);
+    setRefreshToken(userCredentials.refreshToken);
+  };
 
   return {
     accessToken,
-    setAccessToken,
     refreshToken,
-    setRefreshToken,
-    expiresIn,
-    setExpiresIn,
+    setNewCredentials,
   };
 };
 
-export const UserContextProvider = ({ children, spotifyToken }) => {
-  const {
-    accessToken,
-    setAccessToken,
-    refreshToken,
-    setRefreshToken,
-    expiresIn,
-    setExpiresIn,
-  } = useAccessToken();
+export const UserContextProvider = ({ children }) => {
+  console.log("UserContext", useContextCredentials());
 
   return (
-    <Context.Provider
-      value={{
-        spotifyToken,
-        accessToken,
-        setAccessToken,
-        refreshToken,
-        setRefreshToken,
-        expiresIn,
-        setExpiresIn,
-      }}
-    >
+    <Context.Provider value={useContextCredentials()}>
       {children}
     </Context.Provider>
   );
