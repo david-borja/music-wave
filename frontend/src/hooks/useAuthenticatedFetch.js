@@ -31,8 +31,6 @@ export const useAuthenticatedFetch = () => {
     React.useContext(UserContext);
   const [, setLocation] = useLocation();
   const [loading, setLoading] = useState(false);
-  const [tries, setTries] = useState(0);
-
   const fetchWithAuth = async (url, options = {}) => {
     const headers = {
       ...options.headers,
@@ -42,22 +40,23 @@ export const useAuthenticatedFetch = () => {
     const fetchOptions = { method: "GET", ...options, headers };
 
     setLoading(true);
+
     try {
       const response = await fetch(`${BASE_API_URL}${url}`, fetchOptions);
       if (response.status === 401) {
-        if (tries === 0) {
-          setTries(1);
-          const data = await fetchRefreshToken(refreshToken);
-          if (data.accessToken) {
-            setNewCredentials({
-              accessToken: data.accessToken,
-              refreshToken,
-            });
-            fetchWithAuth(url, options);
-          }
+        const data = await fetchRefreshToken(refreshToken);
+        if (data.accessToken) {
+          console.log(
+            `updating old token ${accessToken} for ${data.accessToken} in Context`
+          );
+          setNewCredentials({
+            accessToken: data.accessToken,
+            refreshToken,
+          });
+        } else {
+          setLocation(`/login`);
+          throw new Error("Autentication error");
         }
-        setLocation(`/login`);
-        throw new Error("Autentication error");
       }
       const data = await response.json();
       return data;
