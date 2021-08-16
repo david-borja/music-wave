@@ -10,8 +10,18 @@ const useContextCredentials = () => {
   const [refreshToken, setRefreshToken] = useState(null);
 
   const setNewCredentials = (userCredentials) => {
+    console.log({ userCredentials });
     setAccessToken(userCredentials.accessToken);
     setRefreshToken(userCredentials.refreshToken);
+
+    const { accessToken, refreshToken } = userCredentials;
+    localStorage.setItem(
+      "spotifyToken",
+      JSON.stringify({
+        accessToken,
+        refreshToken,
+      })
+    );
   };
 
   return {

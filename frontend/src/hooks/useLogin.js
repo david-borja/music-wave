@@ -12,22 +12,13 @@ export const AUTH_URL = `https://accounts.spotify.com/authorize?client_id=${proc
 const getCredentials = async (authCode, setLocation, setNewCredentials) => {
   try {
     const data = await auth(authCode);
-
     if (data.accessToken) {
       const { accessToken, refreshToken } = data;
-
       setNewCredentials({ accessToken, refreshToken });
-      localStorage.setItem(
-        "spotifyToken",
-        JSON.stringify({
-          accessToken,
-          refreshToken,
-        })
-      );
       setLocation("/");
     }
   } catch (err) {
-    // console.log(err)
+    console.log(err);
     setLocation("/login");
   }
 };
