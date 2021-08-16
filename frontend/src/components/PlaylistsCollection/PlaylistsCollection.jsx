@@ -1,4 +1,4 @@
-const PlaylistsCollection = ({ userPlaylists }) => {
+const PlaylistsCollection = ({ userPlaylists = [] }) => {
   const renderedPlaylists = userPlaylists.map((item, id) => (
     <div key={id} className="playlist">
       {item.name}
