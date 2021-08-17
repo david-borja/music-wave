@@ -6,6 +6,6 @@ export const accessUrlSearchParam = (searchParamStr) => {
     const urlParams = new URLSearchParams(queryString); // creates a new instance of this interface that defines utility methods to work with the query string of a URL. Returns an object with utilities
     searchParamValue = urlParams.get(searchParamStr);
   }
-  console.log({ searchParamValue });
+  // console.log({ searchParamValue });
   return searchParamValue;
 };

@@ -2,49 +2,45 @@ import React, { useState } from "react";
 
 const Context = React.createContext({});
 
-const useAccessToken = () => {
-  const [accessToken, setAccessToken] = useState("");
-  const [refreshToken, setRefreshToken] = useState("");
-  const [expiresIn, setExpiresIn] = useState(0);
+// The displayName property determines how the context object will be displayed on React DevTools
+Context.displayName = "UserContext";
+
+const useContextCredentials = () => {
+  const [accessToken, setAccessToken] = useState(null);
+  const [refreshToken, setRefreshToken] = useState(null);
+  const [profileInfo, setProfileInfo] = useState({});
+
+  const setNewProfile = (userProfile) => {
+    setProfileInfo(userProfile);
+    localStorage.setItem("spotifyProfile", JSON.stringify(userProfile));
+  };
+
+  const setNewCredentials = (userCredentials) => {
+    setAccessToken(userCredentials.accessToken);
+    setRefreshToken(userCredentials.refreshToken);
+
+    const { accessToken, refreshToken } = userCredentials;
+    localStorage.setItem(
+      "spotifyToken",
+      JSON.stringify({
+        accessToken,
+        refreshToken,
+      })
+    );
+  };
 
   return {
     accessToken,
-    setAccessToken,
     refreshToken,
-    setRefreshToken,
-    expiresIn,
-    setExpiresIn,
+    setNewCredentials,
+    profileInfo,
+    setNewProfile,
   };
 };
 
-export const UserContextProvider = ({ children, spotifyToken }) => {
-  const {
-    accessToken,
-    setAccessToken,
-    refreshToken,
-    setRefreshToken,
-    expiresIn,
-    setExpiresIn,
-  } = useAccessToken();
-
-  // console.log("CONTEXTPROVIDER {");
-  // console.log({ accessToken });
-  // console.log({ refreshToken });
-  // console.log({ spotifyToken });
-  // console.log("CONTEXTPROVIDER }");
-
+export const UserContextProvider = ({ children }) => {
   return (
-    <Context.Provider
-      value={{
-        spotifyToken,
-        accessToken,
-        setAccessToken,
-        refreshToken,
-        setRefreshToken,
-        expiresIn,
-        setExpiresIn,
-      }}
-    >
+    <Context.Provider value={useContextCredentials()}>
       {children}
     </Context.Provider>
   );
