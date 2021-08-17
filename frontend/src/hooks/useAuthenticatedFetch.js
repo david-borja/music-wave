@@ -31,16 +31,14 @@ export const useAuthenticatedFetch = () => {
     React.useContext(UserContext);
   const [, setLocation] = useLocation();
   const [loading, setLoading] = useState(false);
+
   const fetchWithAuth = async (url, options = {}) => {
     const headers = {
       ...options.headers,
       Authorization: `Bearer ${accessToken}`,
     };
-
     const fetchOptions = { method: "GET", ...options, headers };
-
     setLoading(true);
-
     try {
       const response = await fetch(`${BASE_API_URL}${url}`, fetchOptions);
       if (response.status === 401) {
@@ -58,6 +56,8 @@ export const useAuthenticatedFetch = () => {
           throw new Error("Autentication error");
         }
       }
+      console.log({ response });
+      // to do: how to check if the response can be parsed into an object?
       const data = await response.json();
       return data;
     } catch (err) {

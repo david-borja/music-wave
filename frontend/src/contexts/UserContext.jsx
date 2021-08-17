@@ -8,9 +8,14 @@ Context.displayName = "UserContext";
 const useContextCredentials = () => {
   const [accessToken, setAccessToken] = useState(null);
   const [refreshToken, setRefreshToken] = useState(null);
+  const [profileInfo, setProfileInfo] = useState({});
+
+  const setNewProfile = (userProfile) => {
+    setProfileInfo(userProfile);
+    localStorage.setItem("spotifyProfile", JSON.stringify(userProfile));
+  };
 
   const setNewCredentials = (userCredentials) => {
-    console.log({ userCredentials });
     setAccessToken(userCredentials.accessToken);
     setRefreshToken(userCredentials.refreshToken);
 
@@ -28,12 +33,12 @@ const useContextCredentials = () => {
     accessToken,
     refreshToken,
     setNewCredentials,
+    profileInfo,
+    setNewProfile,
   };
 };
 
 export const UserContextProvider = ({ children }) => {
-  console.log("UserContext", useContextCredentials());
-
   return (
     <Context.Provider value={useContextCredentials()}>
       {children}
