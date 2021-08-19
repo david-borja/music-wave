@@ -1,18 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 
-const useQuery = (handleSearch, initialState = "") => {
-  const [state, setState] = useState(initialState);
+import { useControlledInput } from "../../hooks/useControlledInput";
 
+const useQuery = (handleSearch, initialState) => {
+  const { input, handleChange } = useControlledInput(initialState);
   // It seems we can get away without using React.useMemo(()=>{},[]).
   // If we just use a plain object, everything seems to work fine
   const handlers = {
-    handleChange: (e) => {
-      setState(e.target.value);
-      console.log(state);
-    },
+    handleChange,
     handleSubmit: (e) => {
       e.preventDefault();
-      handleSearch(state);
+      handleSearch(input);
     },
   };
 
@@ -31,7 +29,7 @@ const useQuery = (handleSearch, initialState = "") => {
   //   [state, handleSearch]
   // );
 
-  return [state, handlers];
+  return [input, handlers];
 };
 
 const SearchForm = ({ handleSearch }) => {

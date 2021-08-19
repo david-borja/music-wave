@@ -1,4 +1,4 @@
-import { AUTH_URL } from "../../hooks/useLogin";
+import { authUrl } from "../../hooks/useLogin";
 import useLogin from "../../hooks/useLogin";
 
 const LoginPage = () => {
@@ -7,7 +7,7 @@ const LoginPage = () => {
 
   return (
     <div>
-      <a href={AUTH_URL}>Login With Spotify</a>
+      <a href={authUrl}>Login With Spotify</a>
     </div>
   );
 };

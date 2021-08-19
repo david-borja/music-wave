@@ -3,6 +3,7 @@ import React from "react";
 import { useCheckAuthentication } from "../../hooks/useCheckAuthentication";
 import { useAuthenticatedFetch } from "../../hooks/useAuthenticatedFetch";
 import { useUserProfile } from "../../hooks/useUserProfile";
+import { useControlledInput } from "../../hooks/useControlledInput";
 
 import UserContext from "../../contexts/UserContext";
 
@@ -16,9 +17,7 @@ const useUserPlaylists = () => {
   const { loading, fetchWithAuth } = useAuthenticatedFetch();
   const [userPlaylists, setUserPlaylists] = React.useState([]);
   React.useEffect(() => {
-    console.log("outside if");
     if (accessToken) {
-      console.log("inside if");
       fetchWithAuth(USER_PLAYLISTS_URL)
         .then((data) => {
           console.log(data);
@@ -39,7 +38,7 @@ const useNewPlaylist = (setUserPlaylists, userPlaylists) => {
   const { profileInfo } = React.useContext(UserContext);
   const [temporaryId, setTemporaryId] = React.useState(0);
 
-  const handlers = {
+  const newPlaylistHandlers = {
     handleChange: (e) => {
       setNewPlaylist(e.target.value);
     },
@@ -52,31 +51,69 @@ const useNewPlaylist = (setUserPlaylists, userPlaylists) => {
       setNewPlaylist("");
       setTemporaryId(temporaryId + 1);
       const { id: userId } = profileInfo;
-      const CREATE_PLAYLIST_URL = `users/${userId}/playlists`;
+      const createPlaylistUrl = `users/${userId}/playlists`;
       const options = {
         method: "POST",
         body: JSON.stringify({ name: newPlaylist }),
       };
-      fetchWithAuth(CREATE_PLAYLIST_URL, options);
+      fetchWithAuth(createPlaylistUrl, options);
     },
   };
 
-  return [newPlaylist, handlers];
+  return [newPlaylist, newPlaylistHandlers];
 };
 
 const useChangePlaylistName = () => {
+  const { fetchWithAuth } = useAuthenticatedFetch();
   const [editingNameOfPlaylistId, setEditingNameOfPlaylistId] =
     React.useState(null);
+  const { userPlaylists, setUserPlaylists } = useUserPlaylists();
+  const {
+    input: inputChangeName,
+    setInput: setInputChangeName,
+    handleChange: onHandleChange,
+  } = useControlledInput();
 
-  const handleClick = (e) => {
-    // to do: unselect playlist when user does on blur AND doesn't select another playlist
-    const clickedEl = e.target;
-    if (clickedEl.nodeName === "DIV" && clickedEl.className === "playlist") {
-      setEditingNameOfPlaylistId(clickedEl.id);
-    }
+  const changeNameHandlers = {
+    handleClick: (e) => {
+      // to do: unselect playlist when user does on blur AND doesn't select another playlist
+      const clickedEl = e.target;
+      if (clickedEl.nodeName === "DIV" && clickedEl.className === "playlist") {
+        setEditingNameOfPlaylistId(clickedEl.id);
+      }
+    },
+    onHandleChange,
+    onHandleSubmit: (e) => {
+      e.preventDefault();
+      if (inputChangeName) {
+        const [playlistToRename] = userPlaylists.filter(
+          (pList) => pList.id === editingNameOfPlaylistId
+        );
+        const renamedPlaylist = { ...playlistToRename, name: inputChangeName };
+        const reassembledPlaylists = userPlaylists.map((pList) =>
+          pList.id !== editingNameOfPlaylistId ? pList : renamedPlaylist
+        );
+        setUserPlaylists(reassembledPlaylists);
+
+        const playlistId = editingNameOfPlaylistId;
+        const updatePlaylistUrl = `playlists/${playlistId}`;
+        const options = {
+          method: "PUT",
+          body: JSON.stringify({ name: inputChangeName }),
+        };
+
+        // to do: check the response in useAuthenticatedFetch before parsing, because this particular response can't be parsed into an object.
+        fetchWithAuth(updatePlaylistUrl, options);
+      }
+      setEditingNameOfPlaylistId(null);
+      setInputChangeName("");
+    },
   };
-
-  return { handleClick, editingNameOfPlaylistId, setEditingNameOfPlaylistId };
+  return {
+    inputChangeName,
+    changeNameHandlers,
+    editingNameOfPlaylistId,
+  };
 };
 
 const UserPlaylistsPage = () => {
@@ -86,8 +123,11 @@ const UserPlaylistsPage = () => {
     setUserPlaylists,
     userPlaylists
   );
-  const { handleClick, editingNameOfPlaylistId, setEditingNameOfPlaylistId } =
-    useChangePlaylistName();
+  const {
+    inputChangeName,
+    editingNameOfPlaylistId,
+    changeNameHandlers: { handleClick, onHandleChange, onHandleSubmit },
+  } = useChangePlaylistName();
 
   return (
     <div>
@@ -100,8 +140,9 @@ const UserPlaylistsPage = () => {
           <PlaylistsCollection
             userPlaylists={userPlaylists}
             editingNameOfPlaylistId={editingNameOfPlaylistId}
-            setUserPlaylists={setUserPlaylists}
-            setEditingNameOfPlaylistId={setEditingNameOfPlaylistId}
+            inputChangeName={inputChangeName}
+            onHandleChange={onHandleChange}
+            onHandleSubmit={onHandleSubmit}
           />
           <form onSubmit={handleSubmit}>
             <input

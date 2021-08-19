@@ -13,8 +13,8 @@ const useCurrentSearch = () => {
   const [currentSearch, setCurrentSearch] = useState({});
 
   const handleSearch = async (query) => {
-    const SEARCH_URL = `search?q=${query}&type=album,artist,track`;
-    const results = await fetchWithAuth(SEARCH_URL);
+    const searchUrl = `search?q=${query}&type=album,artist,track`;
+    const results = await fetchWithAuth(searchUrl);
     setCurrentSearch(results);
   };
 
