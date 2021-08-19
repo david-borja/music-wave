@@ -16,7 +16,9 @@ const useUserPlaylists = () => {
   const { loading, fetchWithAuth } = useAuthenticatedFetch();
   const [userPlaylists, setUserPlaylists] = React.useState([]);
   React.useEffect(() => {
+    console.log("outside if");
     if (accessToken) {
+      console.log("inside if");
       fetchWithAuth(USER_PLAYLISTS_URL)
         .then((data) => {
           console.log(data);
@@ -90,7 +92,6 @@ const UserPlaylistsPage = () => {
   return (
     <div>
       <h3>UserPlaylists Page</h3>
-
       {loading ? (
         <div>Loading...</div>
       ) : (

@@ -30,6 +30,7 @@ export const useAuthenticatedFetch = () => {
   const { accessToken, refreshToken, setNewCredentials } =
     React.useContext(UserContext);
   const [, setLocation] = useLocation();
+  // Does it make more sense to initialize loading to true instead of false? -> NOPE
   const [loading, setLoading] = useState(false);
 
   const fetchWithAuth = async (url, options = {}) => {
